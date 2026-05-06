@@ -83,6 +83,7 @@
   <!-- Infrastructure -->
   <project path="evolution/manifest" name="manifest" remote="evo" revision="bq2" />
   <project path="evolution/OTA" name="OTA" remote="evo" />
+  <project path="evolution/OTA-VANILLA" name="OTA" remote="evo" revision="bka-vanilla" />
 
   <!-- Kernel -->
   <project path="kernel/configs" name="kernel_configs" groups="vts,pdk" remote="evo" revision="bq2" />
