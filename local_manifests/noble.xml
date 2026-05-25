@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest>
   <project name="a23521745-hub/android_device_samsung_noblelte" path="device/samsung/noblelte" revision="udc" />
-
   <project name="a23521745-hub/android_kernel_samsung_universal7420" path="kernel/samsung/universal7420" revision="udc" />
-
   <project name="a23521745-hub/android_device_samsung_universal7420-common" path="device/samsung/universal7420-common" revision="udc" />
-
   <project name="a23521745-hub/proprietary_vendor_samsung" path="vendor/samsung/noble" revision="udc" />
 </manifest>
