@@ -39,12 +39,12 @@ jobs:
           # Depo alanından tasarruf için --depth=1 ile başlatıyoruz
           repo init -u https://github.com/Evolution-X/manifest -b udc --depth=1 --no-repo-verify
           
-          # Manifesti kopyala
+          # Local manifesti kopyala
           mkdir -p .repo/local_manifests
           cp ../local_manifests/noble.xml .repo/local_manifests/
           
-          # Senkronizasyon (Hata almamak için temizlik komutlarını kaldırdık)
-          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune --depth=1
+          # HATA ÇÖZÜCÜ: Senkronizasyonda hata olmaması için --depth=1 komutunu sildik
+          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
 
       - name: Start ROM Cooking
         run: |
