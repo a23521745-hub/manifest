@@ -33,15 +33,20 @@ jobs:
           git config --global user.email "ali@example.com"
           git config --global user.name "Ali"
           mkdir -p build && cd build
-          repo init -u https://github.com/Evolution-X/manifest -b udc --depth=1
+          
+          # Repo'yu başlat
+          repo init -u https://github.com/Evolution-X/manifest -b udc --depth=1 --no-repo-verify
+          
+          # Local manifest'i kopyala
           mkdir -p .repo/local_manifests
           cp ../local_manifests/noble.xml .repo/local_manifests/
           
-          # Hata önleyici: 'github' remote'u varsa sil
+          # HATA ÖNLEYİCİ: 'github' remote tanımını temizle
           cd .repo/manifests
-          git remote remove github || true 
+          git remote remove github || true
           cd ../..
           
+          # Zorunlu senkronizasyon
           repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune --force-remove-dirty
 
       - name: Start ROM Cooking
