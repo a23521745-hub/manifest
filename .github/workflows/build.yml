@@ -41,12 +41,7 @@ jobs:
           mkdir -p .repo/local_manifests
           cp ../local_manifests/noble.xml .repo/local_manifests/
           
-          # HATA ÖNLEYİCİ: 'github' remote tanımını temizle
-          cd .repo/manifests
-          git remote remove github || true
-          cd ../..
-          
-          # Zorunlu senkronizasyon
+          # Hata veren temizlik komutlarını sildik, doğrudan senkronizasyona geçiyoruz
           repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune --force-remove-dirty
 
       - name: Start ROM Cooking
