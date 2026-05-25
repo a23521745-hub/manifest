@@ -5,7 +5,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04 # Hataları önlemek için sabit, kararlı sürüm
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
@@ -22,7 +22,7 @@ jobs:
       - name: Setup Build Environment
         run: |
           sudo apt-get update
-          sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick liblz4-tool libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev python3 python-is-python3 libncurses6
+          sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick liblz4-tool libncurses-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev python3 python-is-python3
 
       - name: Install Google Repo Tool
         run: |
@@ -33,13 +33,21 @@ jobs:
 
       - name: Initialize and Sync
         run: |
+          # Git kimlik bilgilerini ayarla (O meşhur hatayı engeller)
           git config --global user.email "ali@example.com"
           git config --global user.name "Ali"
+          
           mkdir -p build && cd build
+          
+          # Repo'yu başlat
           repo init -u https://github.com/Evolution-X/manifest -b udc --depth=1
+          
+          # Local manifest klasörünü oluştur ve senin noble.xml dosyanı içine at
           mkdir -p .repo/local_manifests
           cp ../local_manifests/noble.xml .repo/local_manifests/
-          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+          
+          # Çakışmaları ezip geçerek senkronizasyon yap
+          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
 
       - name: Start ROM Cooking
         run: |
