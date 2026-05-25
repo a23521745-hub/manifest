@@ -1,31 +1,55 @@
-name: Evolution X Build
+name: Evolution X Build System
 
 on:
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04 # Hataları önlemek için sabit, kararlı sürüm
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - name: Checkout Source
+        uses: actions/checkout@v4
+        with:
+          ref: udc
+
+      - name: Maximize Build Space
+        run: |
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
       - name: Setup Build Environment
         run: |
           sudo apt-get update
-          sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev libelf-dev liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev python3
+          sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick liblz4-tool libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev python3 python-is-python3 libncurses6
 
-      - name: Initialize Repo
+      - name: Install Google Repo Tool
         run: |
-          mkdir build && cd build
-          repo init -u https://github.com/Evolution-X/manifest -b udc
+          mkdir -p ~/bin
+          curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+          chmod a+x ~/bin/repo
+          sudo ln -sf ~/bin/repo /usr/bin/repo
+
+      - name: Initialize and Sync
+        run: |
+          git config --global user.email "ali@example.com"
+          git config --global user.name "Ali"
+          mkdir -p build && cd build
+          repo init -u https://github.com/Evolution-X/manifest -b udc --depth=1
           mkdir -p .repo/local_manifests
           cp ../local_manifests/noble.xml .repo/local_manifests/
+          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
 
-      - name: Sync and Build
+      - name: Start ROM Cooking
         run: |
           cd build
-          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
           source build/envsetup.sh
           lunch evolution_noblelte-userdebug
-          mka bacon
+          mka bacon -j$(nproc --all)
+
+      - name: Upload Finished ROM
+        uses: actions/upload-artifact@v4
+        with:
+          name: EvolutionX-Note5-Build
+          path: build/out/target/product/noblelte/*.zip
