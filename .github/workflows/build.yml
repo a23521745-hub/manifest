@@ -33,21 +33,26 @@ jobs:
 
       - name: Initialize and Sync
         run: |
-          # Git kimlik bilgilerini ayarla (O meşhur hatayı engeller)
+          # 1. Git kimlik bilgilerini ayarla
           git config --global user.email "ali@example.com"
           git config --global user.name "Ali"
           
+          # 2. Klasörü temizle ve hazırla
           mkdir -p build && cd build
           
-          # Repo'yu başlat
+          # 3. Repo'yu başlat
           repo init -u https://github.com/Evolution-X/manifest -b udc --depth=1
           
-          # Local manifest klasörünü oluştur ve senin noble.xml dosyanı içine at
+          # 4. Local manifesti yerleştir
           mkdir -p .repo/local_manifests
           cp ../local_manifests/noble.xml .repo/local_manifests/
           
-          # Çakışmaları ezip geçerek senkronizasyon yap
-          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune
+          # 5. ÇAKIŞMA ÇÖZÜCÜ: 'github' ismindeki remote çakışmasını temizle
+          cd .repo/manifests && git remote remove github || true
+          cd ../..
+          
+          # 6. Senkronizasyon (Zorla indir ve temizle)
+          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags --optimized-fetch --prune --force-remove-dirty
 
       - name: Start ROM Cooking
         run: |
