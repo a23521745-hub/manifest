@@ -1,0 +1,31 @@
+name: Evolution X Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Build Environment
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y bc bison build-essential ccache curl flex g++-multilib gcc-multilib git gnupg gperf imagemagick lib32ncurses5-dev lib32readline-dev lib32z1-dev libelf-dev liblz4-tool libncurses5 libncurses5-dev libsdl1.2-dev libssl-dev libxml2 libxml2-utils lzop pngcrush rsync schedtool squashfs-tools xsltproc zip zlib1g-dev python3
+
+      - name: Initialize Repo
+        run: |
+          mkdir build && cd build
+          repo init -u https://github.com/Evolution-X/manifest -b udc
+          mkdir -p .repo/local_manifests
+          cp ../local_manifests/noble.xml .repo/local_manifests/
+
+      - name: Sync and Build
+        run: |
+          cd build
+          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+          source build/envsetup.sh
+          lunch evolution_noblelte-userdebug
+          mka bacon
